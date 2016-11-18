@@ -1,13 +1,23 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace GameEngine.Input
 {
     public class KeyboardEventArgs : EventArgs
     {
-        public int Key { get; internal set; }
+        private KeyStrokes _key;
+
+        public KeyboardEventArgs(KeyStrokes code)
+        {
+            this._key = code;
+        }
+
+        public KeyStrokes Key { get { return _key; } }
     }
     public class KeyBoardInput : IDisposable
     {
+        internal KeyStrokes LastKeyPressed;
+
         public event EventHandler<KeyboardEventArgs> KeyBoardKeyPressed;
 
         private WindowsHookHelper.HookDelegate keyBoardDelegate;
@@ -21,12 +31,13 @@ namespace GameEngine.Input
         {
             keyBoardDelegate = KeyboardHookDelegate;
             keyBoardHandle = WindowsHookHelper.SetWindowsHookEx(WH_KEYBOARD_LL, keyBoardDelegate, IntPtr.Zero, 0);
-
+            KeyBoardKeyPressed -= KeyboardInput_KeyBoardKeyPressed;
             KeyBoardKeyPressed += KeyboardInput_KeyBoardKeyPressed;
         }
 
         private void KeyboardInput_KeyBoardKeyPressed(object sender, KeyboardEventArgs e)
         {
+            LastKeyPressed = e.Key;
             Debug.Log(e.Key.ToString());
         }
 
@@ -36,10 +47,18 @@ namespace GameEngine.Input
             {
                 return WindowsHookHelper.CallNextHookEx(keyBoardHandle, Code, wParam, lParam);
             }
+            
+            var pressedKey = GetKeyCode(lParam);
 
-            KeyBoardKeyPressed?.Invoke(this, new KeyboardEventArgs());
+            KeyBoardKeyPressed?.Invoke(this, new KeyboardEventArgs(pressedKey));
 
             return WindowsHookHelper.CallNextHookEx(keyBoardHandle, Code, wParam, lParam);
+        }
+
+        private KeyStrokes GetKeyCode(IntPtr wParam)
+        {
+            int keycode = Marshal.ReadInt32(wParam);
+            return ((KeyStrokes)keycode);
         }
 
         public void Dispose()

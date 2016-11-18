@@ -11,9 +11,11 @@ namespace GameEngine
 {
     public interface IGame
     {
-         GameObjectCollection GameObjects { get; set; }
-         bool ExitGame { get; set; }
+        Thread GameLoopThread { get; set; }
+        ConsoleKey LastKeyPressed { get; set; }
+        GameObjectCollection GameObjects { get; set; }
+        bool ExitGame { get; set; }
         KeyBoardInput keyboardInput { get; set; }
-        
+
     }
 }

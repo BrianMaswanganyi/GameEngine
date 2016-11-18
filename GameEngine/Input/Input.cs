@@ -3,9 +3,11 @@ namespace GameEngine.Input
 {
     public class Input
     {
-        public static bool Key(ConsoleKey checkkey)
+
+        internal static IGame game;
+        public static bool Key(KeyStrokes checkkey)
         {
-            return checkkey == Debug.lastKeyPressed;   
+            return checkkey == game.keyboardInput.LastKeyPressed;   
         }
     }
 }

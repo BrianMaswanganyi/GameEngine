@@ -5,7 +5,6 @@ namespace GameEngine
 {
     internal class Debug
     {
-        internal static ConsoleKey lastKeyPressed;
 
         public static bool IsDebugMode { get; internal set; }
 
